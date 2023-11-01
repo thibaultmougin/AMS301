@@ -39,21 +39,21 @@ int main(int argc, char* argv[])
   int maxit = 1000;
   jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
   
-  // 5. Compute error and export fields
   ScaVector uErr = uNum - uExa;
+  
 
-  for(int i =0; i<mesh.numNodesToExch;++i){
-    uNum(mesh.nodesToExch(i)) /=2;
-  }
+  ScaVector  MUerr = pbm.M * uErr;  
+  exchangeAddInterfMPI(MuErr, m);
 
-  double LocErrL2 =  uErr.transpose()*pbm.M*uErr;
-  double GloErrL2;
+  double L2tot = PdtScalPara(MUerr, uErr, m);
+  
+  double L2fin = sqrt(L2tot/L2ex);
+
 
   exportFieldMsh(uNum, mesh, "solNum", "benchmark/solNum.msh");
   exportFieldMsh(uExa, mesh, "solRef", "benchmark/solExa.msh");
   exportFieldMsh(uErr, mesh, "solErr", "benchmark/solErr.msh");
   
-  MPIReduce(&LocErrL2, &GloErrL2, 1, MPI_DOUBLE, MPI_SUM,0,MPI_COMM_WORLD)
   // 6. Finilize MPI
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
