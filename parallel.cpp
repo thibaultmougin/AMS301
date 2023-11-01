@@ -140,3 +140,20 @@ void exchangeAddInterfMPI(ScaVector& vec, Mesh& mesh)
     }
   }
 }
+
+
+double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& m)
+{
+    double vect_res = 0; 
+        for(int i=0; i<m.nbOfNodes; ++i)
+        {
+            if(m.elemNoRep(i) > 0) 
+            {
+                vect_res += vect1(i)*vect2(i);
+            }
+        }
+    double res_glob;
+    MPI_Allreduce(&vect_res, &res_glob, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    return res_glob;
+}
