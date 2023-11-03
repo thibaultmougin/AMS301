@@ -45,9 +45,13 @@ int main(int argc, char* argv[])
   ScaVector  MUerr = pbm.M * uErr;  
   exchangeAddInterfMPI(MuErr, m);
 
+  ScaVector  MUexa = pbm.M * uExa;  
+  exchangeAddInterfMPI(uExa, m);
+
   double L2tot = PdtScalPara(MUerr, uErr, m);
-  
-  double L2fin = sqrt(L2tot/L2ex);
+  double L2exa = PdtScalPara(MUexa, uExa, m);
+
+  double L2err = sqrt(L2tot/L2exa);
 
 
   exportFieldMsh(uNum, mesh, "solNum", "benchmark/solNum.msh");
