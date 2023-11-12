@@ -54,3 +54,55 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
   }
 }
 
+void ConjGrad(SpMatrix& A, Vector& b, Vector& u, Mesh& m, double tol, int maxit)
+{
+
+  double r0Norm2, rNorm2,r_newNorm2, alpha, beta;
+  Vector Ap, r_new, p_new, x_new;
+  
+  Vector x = u;
+  Vector Ax = A*x;
+  exchangeAddInterfMPI(Ax, m);
+  Vector r  = b - Ax; 
+  Vector p = r;
+  Vector r0 = r;
+ 
+  r0Norm2 = PdtScalPara(r0, r0, m); 
+  int it = 0;
+
+  r_newNorm2 = r0Norm2;
+  do
+    {
+       
+      rNorm2 = PdtScalPara(r, r, m);
+     
+      Ap = A*p;
+      exchangeAddInterfMPI(Ap, m);
+
+      alpha = rNorm2 / PdtScalPara(Ap, p, m);
+
+      
+      x_new = x + alpha*p;
+      
+      r_new = r - alpha*Ap;
+
+      r_newNorm2 = PdtScalPara(r_new, r_new, m);
+
+      beta = r_newNorm2/rNorm2;
+
+      p_new = r_new + beta*p;
+      
+      x = x_new; r = r_new; p = p_new;
+      it ++;
+      
+    }
+  while (sqrt(r_newNorm2) > (tol * sqrt(r0Norm2)) && it < maxit);
+
+  u = x_new;
+  
+  if(myRank == 0){
+    printf("\r   -> final iteration: %i ( max: %i)\n", it, maxit);
+    printf("   -> final residual: %e ( tol: %e)\n", sqrt(r_newNorm2), tol);
+  }
+
+}
