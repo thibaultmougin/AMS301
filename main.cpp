@@ -33,14 +33,24 @@ int main(int argc, char* argv[])
   buildProblem(pbm,mesh,alpha,f);
   
   // 4. Solve problem
-  double tol = 1e-11; // (Currently useless)
-  int maxit = 1000;
+  double tol = 1e-6; // (Currently useless)
+  int maxit = 50000;
   ScaVector test = 0*uNum;
 
-  //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+    MPI_Barrier(MPI_COMM_WORLD);
+    double starttime = MPI_Wtime();
 
-  ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
 
+  jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+
+  //ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    double endtime = MPI_Wtime();
+
+    if (myRank==0) {
+        cout << "   -> time elapsed : " << endtime-starttime << " s "<< endl;
+    }
   
   // 5. Compute error and export fields
 

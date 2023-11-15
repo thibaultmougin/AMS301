@@ -113,6 +113,7 @@ void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, i
 
   //r0Norm2 = r0.transpose()*r0;
   r0Norm2 = dotProductMPI(r0,r0,NodesToRemove);
+  
   r_newNorm2 = r0Norm2;
   do
     {
