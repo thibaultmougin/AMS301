@@ -5,6 +5,7 @@
 #include <fstream>
 #include <Eigen>
 #include <mpi.h>
+#include <math.h>
 
 using namespace std;
 
@@ -34,7 +35,6 @@ struct Mesh
   // Infos for parallel computations
   IntVector numNodesToExch;   // number of nodal values to exchanges between the current proc and each other proc  (Size: nbTasks)
   IntMatrix nodesToExch;      // list of nodal values to exchanges between the current proc and each other proc    (Size: nbTasks x max(numNodesToExch) )
-  IntVector nodesRep;
 
 };
 
@@ -67,7 +67,7 @@ void buildListsNodesMPI(Mesh& mesh);
 // MPI-parallel exchange/add the interface terms
 void exchangeAddInterfMPI(ScaVector& vec, Mesh& mesh);
 
-double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& mesh);
+double dotProductMPI(ScaVector& vec1, ScaVector& vec2, IntVector& NodesToRemove);
 
 //==== Functions in 'problem.cpp'
 

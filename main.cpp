@@ -24,39 +24,43 @@ int main(int argc, char* argv[])
     double x = mesh.coords(i,0);
     double y = mesh.coords(i,1);
     uNum(i) = 0.;
-    uExa(i) = x+y;
-    f(i) = x+y;
+    uExa(i) = cos(4*M_PI*x)*cos(M_PI*y);
+    f(i) = (1+17*M_PI*M_PI)*uExa(i);
   }
-
-
   
   Problem pbm;
   double alpha = 1;
   buildProblem(pbm,mesh,alpha,f);
   
   // 4. Solve problem
-  double tol = 1e-9; // (Currently useless)
-  int maxit = 1000;
+  double tol = 1e-6; // (Currently useless)
+  int maxit = 50000;
+  ScaVector test = 0*uNum;
+
   //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
-  ConjGrad(pbm.A,pbm.b, uNum,mesh,tol,maxit);
-  ScaVector uErr = uNum - uExa;
+
+  ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+
   
-  double L2tot = uErr.transpose()*pbm.M * uErr;  
+  // 5. Compute error and export fields
 
-  double L2exa = uExa.transpose()*pbm.M * uExa;  
+  ScaVector uErr = uNum - uExa;  
+  ScaVector MuErr = pbm.M * uErr;
+  ScaVector MuExa = pbm.M * uExa;  
+  double L2totLocal = MuErr.dot(uErr);
+  double L2exaLocal = MuExa.dot(uExa);
+  double L2tot, L2exa;
+  MPI_Reduce(&L2totLocal, &L2tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&L2exaLocal, &L2exa, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  double L2err = sqrt(L2tot/L2exa);
 
-  double sumerr;
-  double sumexa;
-
-  MPI_Allreduce( &L2tot , &sumerr , 1, MPI_DOUBLE , MPI_SUM , MPI_COMM_WORLD);
-  MPI_Allreduce( &L2exa , &sumexa , 1, MPI_DOUBLE , MPI_SUM , MPI_COMM_WORLD);
-
-  double L2err = sqrt(sumerr/sumexa);
+  if(myRank == 0) printf("\nFinal relative L2 error: %.3e\n",L2err);
 
   exportFieldMsh(uNum, mesh, "solNum", "benchmark/solNum.msh");
   exportFieldMsh(uExa, mesh, "solRef", "benchmark/solExa.msh");
   exportFieldMsh(uErr, mesh, "solErr", "benchmark/solErr.msh");
-  // 6. Finilize MPI
+
+  // 6. Finalize MPI
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
   

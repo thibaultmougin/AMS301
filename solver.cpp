@@ -25,7 +25,23 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
     }
   }
   exchangeAddInterfMPI(Mdiag, mesh);
-  
+
+  // Create list of nodes that don't need to be computed in the residu
+  IntVector NodesToRemove(mesh.nbOfNodes);
+  NodesToRemove = 0*NodesToRemove;
+  for (int nTask = 0; nTask<myRank; nTask++){
+    int i = 0;
+    for (int j = 0; j<mesh.numNodesToExch(nTask); j++){
+      i = mesh.nodesToExch(nTask,j);
+      if (NodesToRemove(i) == 0) {
+        NodesToRemove(i) = 1;
+      }
+    }
+  }
+
+  // Compute the 2-norm of b, for the residu
+  double NormB = sqrt(dotProductMPI(b,b,NodesToRemove));
+
   // Jacobi solver
   double residuNorm = 1e2;
   int it = 0;
@@ -41,9 +57,22 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
     }
     
     // Update residual and iterator
-    if((it % 100) == 0){
+    if((it % 500) == 0){
+      
+      double residuNormLocal = 0;
+      ScaVector Au = A*u;
+      exchangeAddInterfMPI(Au, mesh);
+      ScaVector residu = Au-b;
+      for (int i=0; i<size; i++){
+        if (NodesToRemove(i) == 0) {
+          residuNormLocal += residu(i)*residu(i);
+        } 
+      }
+      MPI_Allreduce(&residuNormLocal, &residuNorm, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      residuNorm = sqrt(residuNorm)/NormB;
+
       if(myRank == 0)
-        cout << "   [" << it << "] residual: " << residuNorm << endl;
+        printf("   [%d] residual: %.3e \n",it,residuNorm);
     }
     it++;
   }

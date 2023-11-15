@@ -45,16 +45,7 @@ void buildListsNodesMPI(Mesh& mesh)
       nodesGloToLoc(nGlo) = -1;  // this node does not belong to the current MPI process
     }
   }
-  for (int nGlo=0;nGlo<mesh.nbOfNodes;nGlo++){
-    for (int nTask=0; nTask<nbTasks; nTask++){
-      if(maskNodesEachProc(nTask, nGlo)){
-        nodesRep(nGlo) = 1;
-        break;
-      }
-      
-      
-    }
-  }
+  
 
   //==== Build list with nodes to exchange between the current MPI process and each neighboring MPI process (i.e. interfaces)
   
@@ -154,19 +145,16 @@ void exchangeAddInterfMPI(ScaVector& vec, Mesh& mesh)
   }
 }
 
+double dotProductMPI(ScaVector& vec1, ScaVector& vec2, IntVector& NodesToRemove){
+  double dotprodLocal = 0;
 
-double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& mesh)
-{
-    double vect_res = 0; 
-        for(int i=0; i<mesh.nbOfNodes; ++i)
-        {
-            if(mesh.nodesRep(i) != 1) 
-            {
-                vect_res += vect1(i)*vect2(i);
-            }
-        }
-    double res_glob;
-    MPI_Allreduce(&vect_res, &res_glob, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-    return res_glob;
+  for (int i=0; i<vec1.size(); i++){
+    if (NodesToRemove(i) == 0) {
+      dotprodLocal += vec1(i)*vec2(i);
+    } 
+  }
+  double dotprod = 0;
+  MPI_Allreduce(&dotprodLocal, &dotprod, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  
+  return dotprod;
 }
