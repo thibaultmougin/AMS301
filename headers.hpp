@@ -34,6 +34,8 @@ struct Mesh
   // Infos for parallel computations
   IntVector numNodesToExch;   // number of nodal values to exchanges between the current proc and each other proc  (Size: nbTasks)
   IntMatrix nodesToExch;      // list of nodal values to exchanges between the current proc and each other proc    (Size: nbTasks x max(numNodesToExch) )
+  IntVector nodesRep;
+
 };
 
 // Structure for problem
@@ -65,6 +67,8 @@ void buildListsNodesMPI(Mesh& mesh);
 // MPI-parallel exchange/add the interface terms
 void exchangeAddInterfMPI(ScaVector& vec, Mesh& mesh);
 
+double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& mesh);
+
 //==== Functions in 'problem.cpp'
 
 // Compute the matrices of the linear wgsystem
@@ -74,5 +78,7 @@ void buildProblem(Problem& p, Mesh& mesh, double alpha, ScaVector& f);
 
 // Solution of the system Au=b with Jacobi
 void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int maxit);
+
+void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int maxit);
 
 #endif /* HEADERS_HPP */

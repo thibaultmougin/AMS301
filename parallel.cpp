@@ -33,17 +33,29 @@ void buildListsNodesMPI(Mesh& mesh)
   //==== Build local numbering for nodes belonging to the current MPI process (i.e. interior + interfaces)
   
   IntVector nodesGloToLoc(mesh.nbOfNodes);
+  IntVector nodesRep(mesh.nbOfNodes);
   int nLoc = 0;
   for(int nGlo=0; nGlo<mesh.nbOfNodes; nGlo++){
     if(maskNodesEachProc(myRank, nGlo)){
       nodesGloToLoc(nGlo) = nLoc;  // this node belongs to the current MPI process
+      
       nLoc++;
     }
     else{
       nodesGloToLoc(nGlo) = -1;  // this node does not belong to the current MPI process
     }
   }
-  
+  for (int nGlo=0;nGlo<mesh.nbOfNodes;nGlo++){
+    for (int nTask=0; nTask<nbTasks; nTask++){
+      if(maskNodesEachProc(nTask, nGlo)){
+        nodesRep(nGlo) = 1;
+        break;
+      }
+      
+      
+    }
+  }
+
   //==== Build list with nodes to exchange between the current MPI process and each neighboring MPI process (i.e. interfaces)
   
   mesh.numNodesToExch.resize(nbTasks);
@@ -71,7 +83,7 @@ void buildListsNodesMPI(Mesh& mesh)
   ScaMatrix coordsMyRank(mesh.nbOfNodes,3);
   IntVector triNumMyRank(mesh.nbOfTri);
   IntMatrix triNodesMyRank(mesh.nbOfTri,3);
-  
+
   nLoc = 0;
   int iLinLoc = 0;
   int iTriLoc = 0;
@@ -80,6 +92,7 @@ void buildListsNodesMPI(Mesh& mesh)
       coordsMyRank(nLoc,0) = mesh.coords(nGlo,0);
       coordsMyRank(nLoc,1) = mesh.coords(nGlo,1);
       coordsMyRank(nLoc,2) = mesh.coords(nGlo,2);
+      
       nLoc++;
     }
   }
@@ -142,12 +155,12 @@ void exchangeAddInterfMPI(ScaVector& vec, Mesh& mesh)
 }
 
 
-double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& m)
+double PdtScalPara(ScaVector& vect1,ScaVector& vect2, Mesh& mesh)
 {
     double vect_res = 0; 
-        for(int i=0; i<m.nbOfNodes; ++i)
+        for(int i=0; i<mesh.nbOfNodes; ++i)
         {
-            if(m.elemNoRep(i) > 0) 
+            if(mesh.nodesRep(i) != 1) 
             {
                 vect_res += vect1(i)*vect2(i);
             }
