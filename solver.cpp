@@ -91,30 +91,51 @@ void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, i
   
   ScaVector x = u;
   ScaVector Ax = A*x;
+  exchangeAddInterfMPI(Ax,mesh);
   ScaVector r  = b - Ax; 
   ScaVector p = r;
   ScaVector r0 = r;
  
-  r0Norm2 = r0.transpose()*r0;
+  
   int it = 0;
 
+  IntVector NodesToRemove(mesh.nbOfNodes);
+  NodesToRemove = 0*NodesToRemove;
+  for (int nTask = 0; nTask<myRank; nTask++){
+    int i = 0;
+    for (int j = 0; j<mesh.numNodesToExch(nTask); j++){
+      i = mesh.nodesToExch(nTask,j);
+      if (NodesToRemove(i) == 0) {
+        NodesToRemove(i) = 1;
+      }
+    }
+  }
+
+  //r0Norm2 = r0.transpose()*r0;
+  r0Norm2 = dotProductMPI(r0,r0,NodesToRemove);
   r_newNorm2 = r0Norm2;
   do
     {
        
-      rNorm2 = r.transpose()*r;
-     
+      //rNorm2 = r.transpose()*r;
+
+      rNorm2 = dotProductMPI(r,r,NodesToRemove);
       Ap = A*p;
 
-      alpha = rNorm2 / (p.transpose()*A*p);
-
+      exchangeAddInterfMPI(Ap, mesh);
       
+      //alpha = rNorm2 / (p.transpose()*A*p);
+
+      alpha = rNorm2 / dotProductMPI(p,Ap,NodesToRemove);
+
+
       x_new = x + alpha*p;
       
       r_new = r - alpha*Ap;
 
-      r_newNorm2 = r_new.transpose()*r_new;
+      //r_newNorm2 = r_new.transpose()*r_new;
 
+      r_newNorm2 = dotProductMPI(r_new,r_new,NodesToRemove);
       beta = r_newNorm2/rNorm2;
 
       p_new = r_new + beta*p;
@@ -123,7 +144,7 @@ void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, i
       it ++;
       
     }
-  while (sqrt(r_newNorm2) > (tol * sqrt(r0Norm2)) && it < maxit);
+    while (sqrt(r_newNorm2) > (tol * sqrt(r0Norm2)) && it < maxit);
 
   u = x_new;
   

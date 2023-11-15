@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
   buildProblem(pbm,mesh,alpha,f);
   
   // 4. Solve problem
-  double tol = 1e-6; // (Currently useless)
-  int maxit = 50000;
+  double tol = 1e-11; // (Currently useless)
+  int maxit = 1000;
   ScaVector test = 0*uNum;
 
   //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
