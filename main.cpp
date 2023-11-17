@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
       double starttime = MPI_Wtime();
 
 
-    jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+    //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
 
-    //ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+    ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
 
       MPI_Barrier(MPI_COMM_WORLD);
       double endtime = MPI_Wtime();
