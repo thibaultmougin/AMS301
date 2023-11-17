@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     
     // 4. Solve problem
     double tol = 1e-6; // (Currently useless)
-    int maxit = 50000;
+    int maxit = 100000;
     ScaVector test = 0*uNum;
 
       MPI_Barrier(MPI_COMM_WORLD);
