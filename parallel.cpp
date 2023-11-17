@@ -62,7 +62,7 @@ void buildListsNodesMPI(Mesh& mesh)
         }
       }
       mesh.numNodesToExch(nTask) = count;
-      cout << "   -> task " << myRank << " send/recv " << mesh.numNodesToExch(nTask) << " nodes with task " << nTask << endl;
+      //cout << "   -> task " << myRank << " send/recv " << mesh.numNodesToExch(nTask) << " nodes with task " << nTask << endl;
     }
   }
   if(mesh.numNodesToExch.maxCoeff() > 0){
