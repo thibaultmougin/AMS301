@@ -8,7 +8,7 @@ do
 #SBATCH --partition=cpu_test
 #SBATCH --account=ams301
 
-#SBATCH --ntasks=4
+#SBATCH --ntasks=i
 #SBATCH --time=00:10:00
 
 ## load modules
