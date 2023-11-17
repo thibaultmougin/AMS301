@@ -2,7 +2,7 @@ Mesh.MshFileVersion = 2.2;
 
 a = 1;
 b = 1;
-h = 0.05;
+h = 0.2;
 
 Point(1) = {0, 0, 0, h};
 Point(2) = {a, 0, 0, h};

@@ -6,6 +6,7 @@
 #include <Eigen>
 #include <mpi.h>
 #include <math.h>
+#include <array>
 
 using namespace std;
 

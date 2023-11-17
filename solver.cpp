@@ -57,7 +57,7 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
     }
     
     // Update residual and iterator
-    if((it % 500) == 0){
+    if((it % 2000) == 0){
       
       double residuNormLocal = 0;
       ScaVector Au = A*u;
