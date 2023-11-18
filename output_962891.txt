@@ -1,0 +1,100 @@
+ Data for JOB [46872,1] offset 0 Total slots allocated 1
+
+ ========================   JOB MAP   ========================
+
+ Data for node: node003	Num slots: 1	Max slots: 0	Num procs: 1
+ 	Process OMPI jobid: [46872,1] App: 0 Process rank: 0 Bound: UNBOUND
+
+ =============================================================
+
+ USING 1 PROCESSES 
+
+ USING MESH : benchmark/mesh01.msh
+
+== read mesh file
+   -> 142 nodes
+   -> 242 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 4000 (prescribed max: 100000)
+   -> final residual: 1.41617e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 0.258668 s 
+   -> time/iterations: 6.46671e-05 s 
+
+Final relative L2 error: 1.904e-01
+
+ USING MESH : benchmark/mesh0072.msh
+
+== read mesh file
+   -> 288 nodes
+   -> 518 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 5000 (prescribed max: 100000)
+   -> final residual: 8.20456e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 0.611832 s 
+   -> time/iterations: 0.000122366 s 
+
+Final relative L2 error: 5.568e-02
+
+ USING MESH : benchmark/mesh005.msh
+
+== read mesh file
+   -> 568 nodes
+   -> 1054 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 7000 (prescribed max: 100000)
+   -> final residual: 8.76003e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 1.68134 s 
+   -> time/iterations: 0.000240191 s 
+
+Final relative L2 error: 2.810e-02
+
+ USING MESH : benchmark/mesh0035.msh
+
+== read mesh file
+   -> 1152 nodes
+   -> 2186 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 14000 (prescribed max: 100000)
+   -> final residual: 8.89798e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 6.82566 s 
+   -> time/iterations: 0.000487547 s 
+
+Final relative L2 error: 1.454e-02
+
+ USING MESH : benchmark/mesh00248.msh
+
+== read mesh file
+   -> 2312 nodes
+   -> 4458 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 34000 (prescribed max: 100000)
+   -> final residual: 9.68853e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 33.2303 s 
+   -> time/iterations: 0.000977361 s 
+
+Final relative L2 error: 1.001e-02
+
+ USING MESH : benchmark/mesh00172.msh
+
+== read mesh file
+   -> 4694 nodes
+   -> 9150 triangles
+== build local numbering and list of nodes for MPI communications
+== build linear system
+== jacobi
+   -> final iteration: 48000 (prescribed max: 100000)
+   -> final residual: 9.53481e-07 (prescribed tol: 1e-06)
+   -> time elapsed : 95.3242 s 
+   -> time/iterations: 0.00198592 s 
+
+Final relative L2 error: 3.286e-03
