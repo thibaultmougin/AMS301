@@ -10,7 +10,7 @@ extern int nbTasks;
 void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int maxit)
 {
   if(myRank == 0)
-    cout << "== jacobi" << endl;
+    cout << "== Jacobi" << endl;
   
   MPI_Barrier(MPI_COMM_WORLD);
   double starttime = MPI_Wtime();
@@ -96,6 +96,8 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
 void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int maxit)
 {
 
+  if(myRank == 0)
+      cout << "== ConjGrad" << endl;
 
 
   double r0Norm2, rNorm2,r_newNorm2, alpha, beta;
