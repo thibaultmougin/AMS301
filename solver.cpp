@@ -12,6 +12,10 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
   if(myRank == 0)
     cout << "== jacobi" << endl;
   
+  MPI_Barrier(MPI_COMM_WORLD);
+  double starttime = MPI_Wtime();
+      
+
   // Compute the solver matrices
   int size = A.rows();
   ScaVector Mdiag(size);
@@ -55,9 +59,9 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
     for(int i=0; i<size; i++){
       u(i) = 1/Mdiag(i) * (Nu(i) + b(i));
     }
-    
+    it++;
     // Update residual and iterator
-    if((it % 2000) == 0){
+    if((it % 1000) == 0){
       
       double residuNormLocal = 0;
       ScaVector Au = A*u;
@@ -70,21 +74,29 @@ void jacobi(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int
       }
       MPI_Allreduce(&residuNormLocal, &residuNorm, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       residuNorm = sqrt(residuNorm)/NormB;
-
+/*
       if(myRank == 0)
-        printf("   [%d] residual: %.3e \n",it,residuNorm);
+        printf("   [%d] residual: %.3e \n",it,residuNorm);*/
     }
-    it++;
+    
   }
-  
+  MPI_Barrier(MPI_COMM_WORLD);
+  double endtime = MPI_Wtime();
   if(myRank == 0){
     cout << "   -> final iteration: " << it << " (prescribed max: " << maxit << ")" << endl;
     cout << "   -> final residual: " << residuNorm << " (prescribed tol: " << tol << ")" << endl;
+    cout << "   -> time elapsed : " << endtime-starttime << " s "<< endl;
+    cout << "   -> time/iterations: " << (endtime-starttime)/it << " s "<< endl;
   }
+  
+
+      
 }
 
 void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, int maxit)
 {
+
+
 
   double r0Norm2, rNorm2,r_newNorm2, alpha, beta;
   ScaVector Ap, r_new, p_new, x_new;
@@ -98,6 +110,9 @@ void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, i
  
   
   int it = 0;
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  double starttime = MPI_Wtime();
 
   IntVector NodesToRemove(mesh.nbOfNodes);
   NodesToRemove = 0*NodesToRemove;
@@ -148,10 +163,13 @@ void ConjGrad(SpMatrix& A, ScaVector& b, ScaVector& u, Mesh& mesh, double tol, i
     while (sqrt(r_newNorm2) > (tol * sqrt(r0Norm2)) && it < maxit);
 
   u = x_new;
-  
+  MPI_Barrier(MPI_COMM_WORLD);
+  double endtime = MPI_Wtime();
   if(myRank == 0){
     printf("\r   -> final iteration: %i ( max: %i)\n", it, maxit);
     printf("   -> final residual: %e ( tol: %e)\n", sqrt(r_newNorm2), tol);
+    cout << "   -> time elapsed : " << endtime-starttime << " s "<< endl;
+    cout << "   -> time/iterations: " << (endtime-starttime)/it << " s "<< endl;
   }
 
 }

@@ -9,12 +9,18 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
   MPI_Comm_size(MPI_COMM_WORLD, &nbTasks);
 
-  array<std::string, 5> texts = {"benchmark/mesh02.msh", "benchmark/mesh01.msh", "benchmark/mesh005.msh", "benchmark/mesh0025.msh", "benchmark/mesh00125.msh",};
+  if (myRank==0){
+    cout << "\n USING "<< nbTasks << " PROCESSES " <<endl;
+    }
+
+  array<std::string, 6> texts = {"benchmark/mesh01.msh","benchmark/mesh0072.msh", "benchmark/mesh005.msh", "benchmark/mesh0035.msh", "benchmark/mesh00248.msh", "benchmark/mesh00172.msh"};
     // ^ An array of 3 elements with the type std::string
 
   for(const auto& text : texts) {   // Range-for!
     
-    cout << "USING MESH : "<< text << "\n" <<"\n";
+    if (myRank==0){
+    cout << "\n USING MESH : "<< text << "\n" <<"\n";
+    }
     
     // 1. Initialize MPI
     
@@ -45,20 +51,13 @@ int main(int argc, char* argv[])
     int maxit = 100000;
     ScaVector test = 0*uNum;
 
-      MPI_Barrier(MPI_COMM_WORLD);
-      double starttime = MPI_Wtime();
+      
 
 
     //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
 
     ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
-
-      MPI_Barrier(MPI_COMM_WORLD);
-      double endtime = MPI_Wtime();
-
-      if (myRank==0) {
-          cout << "   -> time elapsed : " << endtime-starttime << " s "<< endl;
-      }
+      
     
     // 5. Compute error and export fields
 
