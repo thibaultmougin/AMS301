@@ -54,9 +54,9 @@ int main(int argc, char* argv[])
       
 
 
-    //jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+    jacobi(pbm.A, pbm.b, uNum, mesh, tol, maxit);
 
-    ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
+    //ConjGrad(pbm.A, pbm.b, uNum, mesh, tol, maxit);
       
     
     // 5. Compute error and export fields
